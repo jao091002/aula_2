@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora de IMC</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card:#1e293b;
+      --accent:#00d4ff;
+      --accent-dark:#0099cc;
+      --success:#10b981;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --muted:#94a3b8;
+      --text:#e2e8f0;
+    }
+    *{box-sizing:border-box}
+    
+    body{
+      margin:0;
+      font-family:Inter, Roboto, "Segoe UI", Arial, sans-serif;
+      background:linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+      overflow:hidden;
+      position:relative;
+    }
+
+    body::before{
+      content:'';
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);
+      animation:bgShift 12s ease-in-out infinite;
+      pointer-events:none;
+      z-index:1;
+    }
+
+    body::after{
+      content:'';
+      position:fixed;
+      top:-50%;
+      left:-50%;
+      width:200%;
+      height:200%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 70% 70%, rgba(0, 153, 204, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+      animation:bgRotate 30s linear infinite;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    @keyframes bgShift{
+      0%{background:
+        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
+      25%{background:
+        radial-gradient(circle at 40% 30%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 60% 70%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
+      50%{background:
+        radial-gradient(circle at 60% 40%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 60%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
+      75%{background:
+        radial-gradient(circle at 30% 70%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 70% 30%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
+      100%{background:
+        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
+    }
+
+    @keyframes bgRotate{
+      0%{transform:rotate(0deg);}
+      100%{transform:rotate(360deg);}
+    }
+
+    .card{
+      background:linear-gradient(135deg, #1e293b 0%, #233449 100%);
+      width:100%;
+      max-width:500px;
+      border-radius:20px;
+      box-shadow:0 20px 60px rgba(0, 212, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+      padding:40px;
+      border:1px solid rgba(0, 212, 255, 0.2);
+      position:relative;
+      z-index:10;
+      transform-style:preserve-3d;
+      perspective:1000px;
+    }
+
+    h1{
+      margin:0 0 8px 0;
+      font-size:28px;
+      font-weight:700;
+      color:var(--accent);
+      letter-spacing:-0.5px;
+      text-shadow:0 0 20px rgba(0, 212, 255, 0.3);
+    }
+
+    p.lead{
+      margin:0 0 28px 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    form{
+      display:grid;
+      gap:16px;
+    }
+
+    label{
+      font-size:12px;
+      font-weight:600;
+      color:var(--accent);
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+
+    input[type="number"]{
+      width:100%;
+      padding:12px 14px;
+      font-size:15px;
+      border:2px solid rgba(0, 212, 255, 0.2);
+      border-radius:10px;
+      background:rgba(30, 41, 59, 0.8);
+      color:var(--text);
+      outline:none;
+      transition:all 0.3s ease;
+    }
+
+    input[type="number"]:focus{
+      border-color:var(--accent);
+      background:rgba(0, 212, 255, 0.05);
+      box-shadow:0 0 15px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.1);
+      transform:translateZ(10px);
+    }
+
+    input[type="number"]::placeholder{color:rgba(148, 163, 184, 0.5);}
+
+    .controls{
+      display:flex;
+      gap:10px;
+      margin-top:8px;
+    }
+
+    button{
+      cursor:pointer;
+      padding:12px 16px;
+      border-radius:10px;
+      border:0;
+      font-weight:600;
+      font-size:14px;
+      letter-spacing:0.3px;
+      transition:all 0.3s ease;
+      position:relative;
+      overflow:hidden;
+    }
+
+    button::before{
+      content:'';
+      position:absolute;
+      top:0;
+      left:-100%;
+      width:100%;
+      height:100%;
+      background:rgba(255,255,255,0.2);
+      transition:left 0.3s ease;
+      z-index:-1;
+    }
+
+    button:hover::before{left:100%;}
+
+    button.calc{
+      background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color:#000;
+      flex:1;
+      box-shadow:0 8px 24px rgba(0, 212, 255, 0.3);
+      transform:translateZ(5px);
+    }
+
+    button.calc:hover{
+      box-shadow:0 12px 32px rgba(0, 212, 255, 0.4);
+      transform:translateZ(8px) scale(1.02);
+    }
+
+    button.calc:active{transform:translateZ(2px) scale(0.98);}
+
+    button.reset{
+      background:rgba(148, 163, 184, 0.15);
+      color:var(--muted);
+      border:1px solid rgba(148, 163, 184, 0.3);
+      width:120px;
+    }
+
+    button.reset:hover{
+      background:rgba(148, 163, 184, 0.25);
+      color:var(--text);
+    }
+
+    .result{
+      margin-top:24px;
+      padding:16px;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.05) 100%);
+      border:2px solid rgba(0, 212, 255, 0.3);
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      animation:resultPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes resultPulse{
+      0%, 100%{box-shadow:0 0 20px rgba(0, 212, 255, 0.2);}
+      50%{box-shadow:0 0 40px rgba(0, 212, 255, 0.4);}
+    }
+
+    .bmi{
+      font-weight:700;
+      font-size:32px;
+      color:var(--accent);
+      text-shadow:0 0 20px rgba(0, 212, 255, 0.5);
+    }
+
+    .badge{
+      font-size:12px;
+      padding:8px 14px;
+      border-radius:20px;
+      color:white;
+      font-weight:600;
+      box-shadow:0 4px 12px rgba(0, 212, 255, 0.3);
+    }
+
+    .muted{color:var(--muted); font-size:13px;}
+    .note{font-size:11px; color:var(--muted); margin-top:6px; opacity:0.8;}
+
+    @media (max-width:420px){
+      .card{padding:24px;}
+      h1{font-size:24px;}
+      .controls{flex-direction:column;}
+      button.reset{width:100%;}
+      .bmi{font-size:28px;}
+    }
+  </style>
+</head>
+<body>
+  <main class="card" role="main">
+    <h1>IMC</h1>
+    <p class="lead">Calcule seu Índice de Massa Corporal. Insira peso (kg) e altura (m ou cm).</p>
+
+    <form id="imcForm" onsubmit="return false" aria-label="Formulário de cálculo de IMC">
+      <div>
+        <label for="peso">Peso (kg)</label>
+        <input id="peso" type="number" inputmode="decimal" min="1" step="0.1" placeholder="70" required />
+      </div>
+
+      <div>
+        <label for="altura">Altura (m ou cm)</label>
+        <input id="altura" type="number" inputmode="decimal" min="0.3" step="0.01" placeholder="1.75" required />
+        <div class="note">Metros (1.75) ou cm (175). Valores &gt;10 → cm</div>
+      </div>
+
+      <div class="controls">
+        <button type="button" class="calc" id="calcular">Calcular</button>
+        <button type="button" class="reset" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="result" id="resultado" aria-live="polite">
+      <div>
+        <div class="bmi" id="bmiValue">--</div>
+        <div class="muted" id="bmiDesc">Preencha os campos</div>
+      </div>
+      <div style="margin-left:auto" id="bmiBadge"></div>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const pesoEl = document.getElementById('peso');
+      const alturaEl = document.getElementById('altura');
+      const calcularBtn = document.getElementById('calcular');
+      const limparBtn = document.getElementById('limpar');
+      const bmiValueEl = document.getElementById('bmiValue');
+      const bmiDescEl = document.getElementById('bmiDesc');
+      const bmiBadgeEl = document.getElementById('bmiBadge');
+
+      function validar(num){
+        return typeof num === 'number' && isFinite(num) && num > 0;
+      }
+
+      function classificar(bmi){
+        if (bmi < 18.5) return {text:'Magreza', color:'#3b82f6'};
+        if (bmi < 25) return {text:'Peso normal', color:'#10b981'};
+        if (bmi < 30) return {text:'Sobrepeso', color:'#f59e0b'};
+        if (bmi < 35) return {text:'Obesidade I', color:'#f97316'};
+        if (bmi < 40) return {text:'Obesidade II', color:'#ef4444'};
+        return {text:'Obesidade III', color:'#991b1b'};
+      }
+
+      calcularBtn.addEventListener('click', () => {
+        const peso = parseFloat(pesoEl.value.replace(',', '.'));
+        let altura = parseFloat(alturaEl.value.replace(',', '.'));
+
+        if (!validar(peso) || !validar(altura)){
+          bmiValueEl.textContent = '--';
+          bmiDescEl.textContent = 'Valores inválidos';
+          bmiBadgeEl.innerHTML = '';
+          return;
+        }
+
+        if (altura > 10) altura = altura / 100;
+
+        if (altura <= 0) {
+          bmiValueEl.textContent = '--';
+          bmiDescEl.textContent = 'Altura inválida';
+          bmiBadgeEl.innerHTML = '';
+          return;
+        }
+
+        const bmi = peso / (altura * altura);
+        const bmiRounded = Math.round(bmi * 100) / 100;
+        const cls = classificar(bmiRounded);
+
+        bmiValueEl.textContent = bmiRounded.toFixed(2);
+        bmiDescEl.textContent = cls.text;
+        bmiBadgeEl.innerHTML = `<span class="badge" style="background:${cls.color}">${cls.text}</span>`;
+      });
+
+      limparBtn.addEventListener('click', () => {
+        pesoEl.value = '';
+        alturaEl.value = '';
+        bmiValueEl.textContent = '--';
+        bmiDescEl.textContent = 'Preencha os campos';
+        bmiBadgeEl.innerHTML = '';
+        pesoEl.focus();
+      });
+
+      document.getElementById('imcForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        calcularBtn.click();
+      });
+    })();
+  </script>
+</body>
+</html>
