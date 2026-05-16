@@ -6,31 +6,35 @@
   <title>Calculadora de IMC</title>
   <style>
     :root{
-      --bg:#0f172a;
-      --card:#1e293b;
-      --accent:#00d4ff;
-      --accent-dark:#0099cc;
+      --primary:#00d4ff;
+      --primary-dark:#0099cc;
       --success:#10b981;
       --warning:#f59e0b;
       --danger:#ef4444;
-      --muted:#94a3b8;
+      --dark:#0a0e27;
+      --darker:#050812;
+      --surface:#1a1f3a;
+      --surface-light:#252d4a;
       --text:#e2e8f0;
-    }
-    *{box-sizing:border-box}
-    
-    body{
-      margin:0;
-      font-family:Inter, Roboto, "Segoe UI", Arial, sans-serif;
-      background:linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:32px;
-      overflow:hidden;
-      position:relative;
+      --text-muted:#94a3b8;
     }
 
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background:var(--darker);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    /* ===== FUNDO 3D ANIMADO ===== */
     body::before{
       content:'';
       position:fixed;
@@ -38,255 +42,762 @@
       left:0;
       width:100%;
       height:100%;
-      background:
-        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);
-      animation:bgShift 12s ease-in-out infinite;
-      pointer-events:none;
-      z-index:1;
+      background:linear-gradient(135deg, var(--dark) 0%, var(--surface) 50%, var(--darker) 100%);
+      z-index:-2;
     }
 
-    body::after{
-      content:'';
+    .background-3d{
       position:fixed;
-      top:-50%;
-      left:-50%;
-      width:200%;
-      height:200%;
-      background:
-        radial-gradient(circle at 30% 30%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 70% 70%, rgba(0, 153, 204, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
-      animation:bgRotate 30s linear infinite;
-      pointer-events:none;
-      z-index:0;
-    }
-
-    @keyframes bgShift{
-      0%{background:
-        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
-      25%{background:
-        radial-gradient(circle at 40% 30%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 60% 70%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
-      50%{background:
-        radial-gradient(circle at 60% 40%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 40% 60%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
-      75%{background:
-        radial-gradient(circle at 30% 70%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 70% 30%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
-      100%{background:
-        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(0, 153, 204, 0.15) 0%, transparent 50%);}
-    }
-
-    @keyframes bgRotate{
-      0%{transform:rotate(0deg);}
-      100%{transform:rotate(360deg);}
-    }
-
-    .card{
-      background:linear-gradient(135deg, #1e293b 0%, #233449 100%);
+      top:0;
+      left:0;
       width:100%;
-      max-width:500px;
-      border-radius:20px;
-      box-shadow:0 20px 60px rgba(0, 212, 255, 0.15), inset 0 1px 0 rgba(255,255,255,0.1);
-      padding:40px;
-      border:1px solid rgba(0, 212, 255, 0.2);
+      height:100%;
+      z-index:-1;
+      perspective:1200px;
+      overflow:hidden;
+    }
+
+    .bg-sphere{
+      position:absolute;
+      border-radius:50%;
+      opacity:0.15;
+      filter:blur(60px);
+      mix-blend-mode:screen;
+    }
+
+    .bg-sphere-1{
+      width:600px;
+      height:600px;
+      background:radial-gradient(circle at 30% 30%, var(--primary), transparent);
+      top:-100px;
+      left:-100px;
+      animation:float3d 20s ease-in-out infinite;
+    }
+
+    .bg-sphere-2{
+      width:800px;
+      height:800px;
+      background:radial-gradient(circle at 70% 70%, var(--primary-dark), transparent);
+      bottom:-200px;
+      right:-150px;
+      animation:float3d 25s ease-in-out infinite reverse;
+    }
+
+    .bg-sphere-3{
+      width:500px;
+      height:500px;
+      background:radial-gradient(circle at 50% 50%, var(--success), transparent);
+      top:50%;
+      left:50%;
+      transform:translate(-50%, -50%);
+      animation:float3d 30s ease-in-out infinite;
+    }
+
+    @keyframes float3d{
+      0%{transform:translateY(0px) translateX(0px) scale(1);}
+      25%{transform:translateY(-40px) translateX(30px) scale(1.1);}
+      50%{transform:translateY(-80px) translateX(-40px) scale(0.95);}
+      75%{transform:translateY(-40px) translateX(50px) scale(1.05);}
+      100%{transform:translateY(0px) translateX(0px) scale(1);}
+    }
+
+    /* ===== LAYOUT PRINCIPAL ===== */
+    main{
       position:relative;
       z-index:10;
-      transform-style:preserve-3d;
-      perspective:1000px;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
     }
 
+    /* ===== CARD PRINCIPAL ===== */
+    .card{
+      background:linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+      border:1px solid rgba(0, 212, 255, 0.1);
+      border-radius:24px;
+      padding:60px 50px;
+      max-width:550px;
+      width:100%;
+      box-shadow:0 25px 50px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+      backdrop-filter:blur(10px);
+      animation:cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes cardEntrance{
+      0%{
+        opacity:0;
+        transform:translateY(30px) scale(0.95);
+      }
+      100%{
+        opacity:1;
+        transform:translateY(0) scale(1);
+      }
+    }
+
+    /* ===== TIPOGRAFIA ===== */
     h1{
-      margin:0 0 8px 0;
-      font-size:28px;
-      font-weight:700;
-      color:var(--accent);
-      letter-spacing:-0.5px;
-      text-shadow:0 0 20px rgba(0, 212, 255, 0.3);
+      font-size:48px;
+      font-weight:800;
+      background:linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin:0 0 12px 0;
+      letter-spacing:-1px;
     }
 
-    p.lead{
-      margin:0 0 28px 0;
-      color:var(--muted);
-      font-size:14px;
+    .subtitle{
+      font-size:16px;
+      color:var(--text-muted);
+      margin:0 0 50px 0;
       line-height:1.6;
+      font-weight:400;
     }
 
-    form{
-      display:grid;
-      gap:16px;
+    /* ===== FORMULÁRIO ===== */
+    .form-group{
+      margin-bottom:32px;
     }
 
     label{
-      font-size:12px;
+      display:block;
+      font-size:13px;
       font-weight:600;
-      color:var(--accent);
+      color:var(--primary);
       text-transform:uppercase;
-      letter-spacing:0.5px;
+      letter-spacing:1px;
+      margin-bottom:12px;
+      transition:color 0.3s;
+    }
+
+    .form-group:focus-within label{
+      color:var(--success);
     }
 
     input[type="number"]{
       width:100%;
-      padding:12px 14px;
-      font-size:15px;
+      padding:16px 18px;
+      font-size:16px;
       border:2px solid rgba(0, 212, 255, 0.2);
-      border-radius:10px;
-      background:rgba(30, 41, 59, 0.8);
+      border-radius:14px;
+      background:rgba(0, 212, 255, 0.02);
       color:var(--text);
+      font-weight:500;
       outline:none;
-      transition:all 0.3s ease;
+      transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      backdrop-filter:blur(10px);
     }
 
     input[type="number"]:focus{
-      border-color:var(--accent);
-      background:rgba(0, 212, 255, 0.05);
-      box-shadow:0 0 15px rgba(0, 212, 255, 0.2), inset 0 0 10px rgba(0, 212, 255, 0.1);
-      transform:translateZ(10px);
+      border-color:var(--primary);
+      background:rgba(0, 212, 255, 0.08);
+      box-shadow:0 0 0 3px rgba(0, 212, 255, 0.1), inset 0 2px 8px rgba(0, 212, 255, 0.05);
+      transform:scale(1.02);
     }
 
-    input[type="number"]::placeholder{color:rgba(148, 163, 184, 0.5);}
+    input[type="number"]::placeholder{
+      color:rgba(148, 163, 184, 0.4);
+    }
 
-    .controls{
-      display:flex;
-      gap:10px;
+    .input-hint{
+      font-size:12px;
+      color:var(--text-muted);
       margin-top:8px;
+      font-weight:400;
+    }
+
+    /* ===== BOTÕES ===== */
+    .btn-group{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:16px;
+      margin:48px 0;
     }
 
     button{
+      padding:18px 24px;
+      border:none;
+      border-radius:12px;
+      font-size:15px;
+      font-weight:700;
       cursor:pointer;
-      padding:12px 16px;
-      border-radius:10px;
-      border:0;
-      font-weight:600;
-      font-size:14px;
-      letter-spacing:0.3px;
-      transition:all 0.3s ease;
+      transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
       position:relative;
       overflow:hidden;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      min-height:56px;
     }
 
     button::before{
       content:'';
       position:absolute;
-      top:0;
-      left:-100%;
-      width:100%;
-      height:100%;
-      background:rgba(255,255,255,0.2);
-      transition:left 0.3s ease;
-      z-index:-1;
+      top:50%;
+      left:50%;
+      width:0;
+      height:0;
+      border-radius:50%;
+      background:rgba(255,255,255,0.15);
+      transform:translate(-50%, -50%);
+      transition:width 0.6s, height 0.6s;
     }
 
-    button:hover::before{left:100%;}
+    button:active::before{
+      width:300px;
+      height:300px;
+    }
 
-    button.calc{
-      background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    .btn-calc{
+      background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       color:#000;
-      flex:1;
-      box-shadow:0 8px 24px rgba(0, 212, 255, 0.3);
-      transform:translateZ(5px);
+      font-size:16px;
+      padding:18px 32px;
+      box-shadow:0 8px 24px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+      grid-column:1;
     }
 
-    button.calc:hover{
-      box-shadow:0 12px 32px rgba(0, 212, 255, 0.4);
-      transform:translateZ(8px) scale(1.02);
+    .btn-calc:hover{
+      box-shadow:0 16px 40px rgba(0, 212, 255, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+      transform:translateY(-2px);
     }
 
-    button.calc:active{transform:translateZ(2px) scale(0.98);}
-
-    button.reset{
-      background:rgba(148, 163, 184, 0.15);
-      color:var(--muted);
-      border:1px solid rgba(148, 163, 184, 0.3);
-      width:120px;
+    .btn-calc:active{
+      transform:translateY(0px);
+      box-shadow:0 4px 12px rgba(0, 212, 255, 0.2);
     }
 
-    button.reset:hover{
-      background:rgba(148, 163, 184, 0.25);
-      color:var(--text);
+    .btn-secondary{
+      background:rgba(0, 212, 255, 0.08);
+      color:var(--primary);
+      border:1.5px solid var(--primary);
+      font-size:14px;
+      padding:16px 20px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
+      grid-column:2;
     }
 
-    .result{
-      margin-top:24px;
-      padding:16px;
-      border-radius:14px;
-      background:linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.05) 100%);
-      border:2px solid rgba(0, 212, 255, 0.3);
-      min-height:64px;
+    .btn-secondary:hover{
+      background:rgba(0, 212, 255, 0.15);
+      transform:translateY(-2px);
+      box-shadow:0 8px 16px rgba(0, 212, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .btn-secondary:active{
+      transform:translateY(0px);
+      background:rgba(0, 212, 255, 0.1);
+    }
+
+    /* ===== RESULTADO ===== */
+    .result-container{
+      margin:48px 0;
+      padding:32px;
+      background:linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%);
+      border:1.5px solid var(--primary);
+      border-radius:16px;
       display:flex;
       align-items:center;
-      gap:16px;
-      animation:resultPulse 2s ease-in-out infinite;
+      justify-content:space-between;
+      gap:24px;
+      min-height:120px;
+      backdrop-filter:blur(10px);
+      animation:resultPulse 3s ease-in-out infinite;
     }
 
     @keyframes resultPulse{
-      0%, 100%{box-shadow:0 0 20px rgba(0, 212, 255, 0.2);}
-      50%{box-shadow:0 0 40px rgba(0, 212, 255, 0.4);}
+      0%, 100%{box-shadow:0 0 20px rgba(0, 212, 255, 0.2), inset 0 1px 0 rgba(255,255,255,0.05);}
+      50%{box-shadow:0 0 40px rgba(0, 212, 255, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);}
     }
 
-    .bmi{
+    .result-value{
+      flex:1;
+    }
+
+    .result-bmi{
+      font-size:56px;
+      font-weight:900;
+      background:linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      line-height:1;
+      margin-bottom:8px;
+    }
+
+    .result-label{
+      font-size:13px;
+      color:var(--text-muted);
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      font-weight:500;
+    }
+
+    .result-badge{
+      padding:12px 24px;
+      background:var(--primary);
+      color:#000;
+      border-radius:50px;
+      font-size:13px;
       font-weight:700;
-      font-size:32px;
-      color:var(--accent);
-      text-shadow:0 0 20px rgba(0, 212, 255, 0.5);
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      box-shadow:0 8px 24px rgba(0, 212, 255, 0.3);
+      text-align:center;
+      min-width:180px;
     }
 
-    .badge{
-      font-size:12px;
-      padding:8px 14px;
+    /* ===== FLOATING BUTTONS ===== */
+    .floating-btn{
+      position:fixed;
+      width:70px;
+      height:70px;
+      border-radius:50%;
+      border:none;
+      font-size:28px;
+      cursor:pointer;
+      box-shadow:0 8px 24px rgba(0, 0, 0, 0.3);
+      transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index:15;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .floating-btn::before{
+      width:0;
+      height:0;
+    }
+
+    .floating-btn:hover{
+      transform:scale(1.15);
+      box-shadow:0 12px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .floating-btn:active{
+      transform:scale(0.95);
+    }
+
+    .btn-history{
+      bottom:40px;
+      right:40px;
+      background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color:#000;
+    }
+
+    .btn-admin{
+      bottom:40px;
+      left:40px;
+      background:linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color:#fff;
+    }
+
+    /* ===== PAINEL DESLIZANTE ===== */
+    .side-panel{
+      position:fixed;
+      top:0;
+      width:420px;
+      height:100vh;
+      background:linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+      border:1px solid rgba(0, 212, 255, 0.1);
+      backdrop-filter:blur(10px);
+      overflow-y:auto;
+      padding:32px;
+      z-index:20;
+      box-shadow:-20px 0 60px rgba(0, 0, 0, 0.4);
+      transition:all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      scrollbar-width:thin;
+      scrollbar-color:var(--primary) transparent;
+    }
+
+    .side-panel::-webkit-scrollbar{
+      width:6px;
+    }
+
+    .side-panel::-webkit-scrollbar-track{
+      background:transparent;
+    }
+
+    .side-panel::-webkit-scrollbar-thumb{
+      background:var(--primary);
+      border-radius:3px;
+    }
+
+    .panel-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:32px;
+      padding-bottom:20px;
+      border-bottom:1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .panel-header h2{
+      font-size:24px;
+      font-weight:800;
+      background:linear-gradient(135deg, var(--primary) 0%, var(--success) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .panel-close{
+      background:none;
+      border:none;
+      color:var(--primary);
+      font-size:28px;
+      cursor:pointer;
+      width:40px;
+      height:40px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:8px;
+      transition:all 0.3s;
+      padding:0;
+    }
+
+    .panel-close:hover{
+      background:rgba(0, 212, 255, 0.1);
+      transform:rotate(90deg);
+    }
+
+    .history-panel{
+      right:-420px;
+      border-right:none;
+      border-left:1px solid rgba(0, 212, 255, 0.1);
+      box-shadow:-20px 0 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .history-panel.active{
+      right:0;
+    }
+
+    .admin-panel{
+      left:-420px;
+      border-left:none;
+      border-right:1px solid rgba(0, 212, 255, 0.1);
+      box-shadow:20px 0 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .admin-panel.active{
+      left:0;
+    }
+
+    /* ===== ITEM LISTA ===== */
+    .item-list{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      max-height:calc(100vh - 300px);
+      overflow-y:auto;
+    }
+
+    .item{
+      padding:16px;
+      background:rgba(0, 212, 255, 0.05);
+      border:1px solid rgba(0, 212, 255, 0.1);
+      border-radius:12px;
+      cursor:pointer;
+      transition:all 0.3s;
+    }
+
+    .item:hover{
+      background:rgba(0, 212, 255, 0.12);
+      border-color:var(--primary);
+      transform:translateX(4px);
+    }
+
+    .item-time{
+      font-size:11px;
+      color:var(--text-muted);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+
+    .item-data{
+      font-size:14px;
+      color:var(--text);
+      font-weight:600;
+      margin-bottom:8px;
+    }
+
+    .item-result{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .item-bmi{
+      font-size:18px;
+      font-weight:800;
+      color:var(--primary);
+    }
+
+    .item-badge{
+      font-size:10px;
+      padding:4px 10px;
       border-radius:20px;
       color:white;
-      font-weight:600;
-      box-shadow:0 4px 12px rgba(0, 212, 255, 0.3);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
     }
 
-    .muted{color:var(--muted); font-size:13px;}
-    .note{font-size:11px; color:var(--muted); margin-top:6px; opacity:0.8;}
+    .empty-state{
+      text-align:center;
+      padding:40px 20px;
+      color:var(--text-muted);
+    }
 
-    @media (max-width:420px){
-      .card{padding:24px;}
-      h1{font-size:24px;}
-      .controls{flex-direction:column;}
-      button.reset{width:100%;}
-      .bmi{font-size:28px;}
+    .empty-state-icon{
+      font-size:48px;
+      margin-bottom:16px;
+    }
+
+    /* ===== ADMIN STATS ===== */
+    .stat-box{
+      padding:16px;
+      background:rgba(0, 212, 255, 0.05);
+      border:1px solid rgba(0, 212, 255, 0.1);
+      border-radius:12px;
+      margin-bottom:12px;
+    }
+
+    .stat-label{
+      font-size:12px;
+      color:var(--text-muted);
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      margin-bottom:6px;
+    }
+
+    .stat-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--primary);
+    }
+
+    /* ===== RESPONSIVO ===== */
+    @media (max-width:768px){
+      .card{
+        padding:40px 28px;
+        border-radius:20px;
+      }
+
+      h1{
+        font-size:36px;
+      }
+
+      .btn-group{
+        grid-template-columns:1fr;
+        margin:40px 0;
+      }
+
+      .btn-calc, .btn-secondary{
+        grid-column:1;
+      }
+
+      .result-container{
+        flex-direction:column;
+        gap:16px;
+        padding:24px;
+      }
+
+      .result-badge{
+        min-width:auto;
+        width:100%;
+      }
+
+      .side-panel{
+        width:100%;
+        border-radius:24px 24px 0 0;
+      }
+
+      .history-panel{
+        right:-100%;
+        border-left:1px solid rgba(0, 212, 255, 0.1);
+        box-shadow:0 -20px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      .history-panel.active{
+        right:0;
+        bottom:0;
+        top:auto;
+        height:80vh;
+      }
+
+      .admin-panel{
+        left:-100%;
+        border-right:1px solid rgba(0, 212, 255, 0.1);
+        box-shadow:0 -20px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      .admin-panel.active{
+        left:0;
+        bottom:0;
+        top:auto;
+        height:80vh;
+      }
+
+      .floating-btn{
+        width:60px;
+        height:60px;
+        font-size:24px;
+      }
+
+      .btn-history{
+        bottom:30px;
+        right:30px;
+      }
+
+      .btn-admin{
+        bottom:30px;
+        left:30px;
+      }
+    }
+
+    @media (max-width:480px){
+      main{
+        padding:24px 16px;
+      }
+
+      .card{
+        padding:32px 20px;
+      }
+
+      h1{
+        font-size:28px;
+      }
+
+      .subtitle{
+        font-size:14px;
+        margin-bottom:36px;
+      }
+
+      button{
+        min-height:52px;
+        padding:16px 18px;
+      }
+
+      .result-bmi{
+        font-size:40px;
+      }
+
+      .floating-btn{
+        width:54px;
+        height:54px;
+        font-size:20px;
+      }
+
+      .btn-history{
+        bottom:20px;
+        right:20px;
+      }
+
+      .btn-admin{
+        bottom:20px;
+        left:20px;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Fundo 3D Animado -->
+  <div class="background-3d">
+    <div class="bg-sphere bg-sphere-1"></div>
+    <div class="bg-sphere bg-sphere-2"></div>
+    <div class="bg-sphere bg-sphere-3"></div>
+  </div>
+
+  <!-- Conteúdo Principal -->
   <main class="card" role="main">
     <h1>IMC</h1>
-    <p class="lead">Calcule seu Índice de Massa Corporal. Insira peso (kg) e altura (m ou cm).</p>
+    <p class="subtitle">Calcule seu índice de massa corporal de forma simples e rápida</p>
 
-    <form id="imcForm" onsubmit="return false" aria-label="Formulário de cálculo de IMC">
-      <div>
-        <label for="peso">Peso (kg)</label>
+    <form id="imcForm" onsubmit="return false">
+      <div class="form-group">
+        <label for="peso">Peso</label>
         <input id="peso" type="number" inputmode="decimal" min="1" step="0.1" placeholder="70" required />
+        <div class="input-hint">Em quilogramas (kg)</div>
       </div>
 
-      <div>
-        <label for="altura">Altura (m ou cm)</label>
+      <div class="form-group">
+        <label for="altura">Altura</label>
         <input id="altura" type="number" inputmode="decimal" min="0.3" step="0.01" placeholder="1.75" required />
-        <div class="note">Metros (1.75) ou cm (175). Valores &gt;10 → cm</div>
+        <div class="input-hint">Em metros (1.75) ou centímetros (175)</div>
       </div>
 
-      <div class="controls">
-        <button type="button" class="calc" id="calcular">Calcular</button>
-        <button type="button" class="reset" id="limpar">Limpar</button>
+      <div class="btn-group">
+        <button type="button" class="btn-calc" id="calcular">Calcular IMC</button>
+        <button type="button" class="btn-secondary" id="limpar">Limpar</button>
       </div>
     </form>
 
-    <div class="result" id="resultado" aria-live="polite">
-      <div>
-        <div class="bmi" id="bmiValue">--</div>
-        <div class="muted" id="bmiDesc">Preencha os campos</div>
+    <div class="result-container" id="resultado" aria-live="polite">
+      <div class="result-value">
+        <div class="result-bmi" id="bmiValue">--</div>
+        <div class="result-label" id="bmiDesc">Preencha os campos</div>
       </div>
-      <div style="margin-left:auto" id="bmiBadge"></div>
+      <div class="result-badge" id="bmiBadge">--</div>
     </div>
   </main>
 
+  <!-- Botões Flutuantes -->
+  <button class="floating-btn btn-history" id="toggleHistory" aria-label="Histórico de cálculos">📋</button>
+  <button class="floating-btn btn-admin" id="toggleAdmin" aria-label="Painel administrativo">👨‍💼</button>
+
+  <!-- Painel de Histórico -->
+  <div class="side-panel history-panel" id="historyPanel" role="dialog" aria-labelledby="historyTitle">
+    <div class="panel-header">
+      <h2 id="historyTitle">Histórico</h2>
+      <button class="panel-close" id="closeHistory">✕</button>
+    </div>
+    <div class="item-list" id="historyList">
+      <div class="empty-state">
+        <div class="empty-state-icon">📭</div>
+        <p>Nenhum cálculo realizado ainda</p>
+      </div>
+    </div>
+    <div style="margin-top:24px; display:flex; gap:12px;">
+      <button type="button" class="btn-calc" id="exportHistory" style="flex:1; margin:0;">Exportar</button>
+      <button type="button" class="btn-secondary" id="clearHistory" style="flex:1; margin:0; padding:16px 12px;">Limpar</button>
+    </div>
+  </div>
+
+  <!-- Painel Admin -->
+  <div class="side-panel admin-panel" id="adminPanel" role="dialog" aria-labelledby="adminTitle">
+    <div class="panel-header">
+      <h2 id="adminTitle">Estatísticas</h2>
+      <button class="panel-close" id="closeAdmin">✕</button>
+    </div>
+
+    <div style="margin-bottom:24px;">
+      <h3 style="font-size:13px; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px; font-weight:700;">Globais</h3>
+      <div class="stat-box">
+        <div class="stat-label">👥 Usuários</div>
+        <div class="stat-value" id="statTotalUsers">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">🧮 Cálculos</div>
+        <div class="stat-value" id="statTotalCalcs">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">📈 IMC Médio</div>
+        <div class="stat-value" id="statAvgBmi">--</div>
+      </div>
+    </div>
+
+    <button type="button" class="btn-calc" id="createBackup" style="width:100%; margin-bottom:24px;">💾 Criar Backup</button>
+
+    <h3 style="font-size:13px; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:16px; font-weight:700;">Usuários Recentes</h3>
+    <div class="item-list" id="adminUsersList"></div>
+  </div>
+
+  <script src="db.js"></script>
   <script>
     (function(){
       const pesoEl = document.getElementById('peso');
@@ -296,19 +807,131 @@
       const bmiValueEl = document.getElementById('bmiValue');
       const bmiDescEl = document.getElementById('bmiDesc');
       const bmiBadgeEl = document.getElementById('bmiBadge');
-
-      function validar(num){
-        return typeof num === 'number' && isFinite(num) && num > 0;
-      }
+      const toggleHistoryBtn = document.getElementById('toggleHistory');
+      const toggleAdminBtn = document.getElementById('toggleAdmin');
+      const closeHistoryBtn = document.getElementById('closeHistory');
+      const closeAdminBtn = document.getElementById('closeAdmin');
+      const historyPanel = document.getElementById('historyPanel');
+      const adminPanel = document.getElementById('adminPanel');
+      const historyList = document.getElementById('historyList');
+      const clearHistoryBtn = document.getElementById('clearHistory');
+      const exportHistoryBtn = document.getElementById('exportHistory');
+      const createBackupBtn = document.getElementById('createBackup');
 
       function classificar(bmi){
         if (bmi < 18.5) return {text:'Magreza', color:'#3b82f6'};
-        if (bmi < 25) return {text:'Peso normal', color:'#10b981'};
+        if (bmi < 25) return {text:'Peso Normal', color:'#10b981'};
         if (bmi < 30) return {text:'Sobrepeso', color:'#f59e0b'};
         if (bmi < 35) return {text:'Obesidade I', color:'#f97316'};
         if (bmi < 40) return {text:'Obesidade II', color:'#ef4444'};
         return {text:'Obesidade III', color:'#991b1b'};
       }
+
+      function validar(num){
+        return typeof num === 'number' && isFinite(num) && num > 0;
+      }
+
+      function renderHistory(){
+        const history = db.getUserHistory();
+        if(history.length === 0){
+          historyList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhum cálculo realizado</p></div>';
+          return;
+        }
+        historyList.innerHTML = history.map(item => `
+          <div class="item" data-id="${item.id}">
+            <div class="item-time">${new Date(item.timestamp).toLocaleString('pt-BR')}</div>
+            <div class="item-data">${item.peso}kg • ${item.altura}m</div>
+            <div class="item-result">
+              <span class="item-bmi">${item.bmi}</span>
+              <span class="item-badge" style="background:${item.classificacao.color}">${item.classificacao.text}</span>
+            </div>
+          </div>
+        `).join('');
+
+        document.querySelectorAll('.item').forEach(item => {
+          item.addEventListener('click', () => {
+            const id = item.dataset.id;
+            const entry = history.find(e => e.id == id);
+            if(entry){
+              pesoEl.value = entry.peso;
+              alturaEl.value = entry.altura;
+              closePanel();
+            }
+          });
+        });
+      }
+
+      function updateAdminPanel(){
+        const stats = db.getUsageStats();
+        const globalStats = db.getGlobalStats();
+        const users = db.getAllUsers();
+
+        document.getElementById('statTotalUsers').textContent = stats.totalUsers;
+        document.getElementById('statTotalCalcs').textContent = stats.totalCalculations;
+        document.getElementById('statAvgBmi').textContent = globalStats.averageBmi || '--';
+
+        document.getElementById('adminUsersList').innerHTML = users.slice(0, 8).length > 0
+          ? users.slice(0, 8).map(u => `
+              <div class="item">
+                <div class="item-time">${u.id}</div>
+                <div class="item-data">${u.totalCalcs} cálculos</div>
+                <div style="font-size:12px; color:var(--text-muted);">IMC Médio: ${u.avgBmi}</div>
+              </div>
+            `).join('')
+          : '<div class="empty-state"><p style="margin:0;">Sem usuários</p></div>';
+      }
+
+      function closePanel(){
+        historyPanel.classList.remove('active');
+        toggleHistoryBtn.classList.remove('active');
+      }
+
+      function closeAdminPanel(){
+        adminPanel.classList.remove('active');
+        toggleAdminBtn.classList.remove('active');
+      }
+
+      toggleHistoryBtn.addEventListener('click', () => {
+        historyPanel.classList.toggle('active');
+        toggleHistoryBtn.classList.toggle('active');
+        renderHistory();
+      });
+
+      toggleAdminBtn.addEventListener('click', () => {
+        adminPanel.classList.toggle('active');
+        toggleAdminBtn.classList.toggle('active');
+        updateAdminPanel();
+      });
+
+      closeHistoryBtn.addEventListener('click', closePanel);
+      closeAdminBtn.addEventListener('click', closeAdminPanel);
+
+      clearHistoryBtn.addEventListener('click', () => {
+        if(confirm('Tem certeza?')){
+          db.clearUserHistory();
+          renderHistory();
+          alert('✅ Histórico limpo!');
+        }
+      });
+
+      exportHistoryBtn.addEventListener('click', () => {
+        const csv = db.exportToCSV();
+        if(csv.split('\n').length <= 1){
+          alert('Nenhum dado para exportar');
+          return;
+        }
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `imc_${Date.now()}.csv`;
+        link.click();
+      });
+
+      createBackupBtn.addEventListener('click', () => {
+        db.createBackup();
+        updateAdminPanel();
+        alert('✅ Backup criado!');
+      });
 
       calcularBtn.addEventListener('click', () => {
         const peso = parseFloat(pesoEl.value.replace(',', '.'));
@@ -317,7 +940,7 @@
         if (!validar(peso) || !validar(altura)){
           bmiValueEl.textContent = '--';
           bmiDescEl.textContent = 'Valores inválidos';
-          bmiBadgeEl.innerHTML = '';
+          bmiBadgeEl.textContent = '--';
           return;
         }
 
@@ -326,7 +949,7 @@
         if (altura <= 0) {
           bmiValueEl.textContent = '--';
           bmiDescEl.textContent = 'Altura inválida';
-          bmiBadgeEl.innerHTML = '';
+          bmiBadgeEl.textContent = '--';
           return;
         }
 
@@ -336,7 +959,15 @@
 
         bmiValueEl.textContent = bmiRounded.toFixed(2);
         bmiDescEl.textContent = cls.text;
-        bmiBadgeEl.innerHTML = `<span class="badge" style="background:${cls.color}">${cls.text}</span>`;
+        bmiBadgeEl.textContent = cls.text;
+        bmiBadgeEl.style.background = cls.color;
+
+        db.addCalculation({
+          peso: peso.toFixed(2),
+          altura: altura.toFixed(2),
+          bmi: bmiRounded.toFixed(2),
+          classificacao: cls
+        });
       });
 
       limparBtn.addEventListener('click', () => {
@@ -344,7 +975,8 @@
         alturaEl.value = '';
         bmiValueEl.textContent = '--';
         bmiDescEl.textContent = 'Preencha os campos';
-        bmiBadgeEl.innerHTML = '';
+        bmiBadgeEl.textContent = '--';
+        bmiBadgeEl.style.background = '';
         pesoEl.focus();
       });
 
@@ -352,6 +984,18 @@
         e.preventDefault();
         calcularBtn.click();
       });
+
+      document.addEventListener('click', (e) => {
+        if(!historyPanel.contains(e.target) && !toggleHistoryBtn.contains(e.target)){
+          closePanel();
+        }
+        if(!adminPanel.contains(e.target) && !toggleAdminBtn.contains(e.target)){
+          closeAdminPanel();
+        }
+      });
+
+      renderHistory();
+      setInterval(() => renderHistory(), 5000);
     })();
   </script>
 </body>
